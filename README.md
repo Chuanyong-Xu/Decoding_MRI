@@ -13,6 +13,8 @@ Thanks for Ning Mei providing these python script templates for decoding
 <br>(3)欧式、马氏、相关距离的可靠性相似，但相关距离的可解释性稍差；
 <br>(4)交叉验证距离估计是无偏的(unbias)，具备有意义的基线零点，使得距离比值可解释。
 <br>交叉验证马氏距离(crossnobis)计算过程：马氏距离的核心思想是：在计算两个条件表征模式之间的距离时，不仅考虑模式均值差异，还考虑各特征维度的噪声方差及特征间的噪声协方差。
+#### 总结：作者推荐采用交叉验证的马氏距离；即使不计算马氏距离，但至少应结合交叉验证、多变量噪声标准化，来构建距离矩阵。
+
 #### 一、fMRI 数据中的计算流程：
 fMRI 数据通常先通过一阶 GLM 得到每个条件的 response pattern。对于一个被试、一个 ROI 或一个 searchlight，数据结构可以表示为：
 （1）原始时序数据：time points × voxels，即每个体素在每个时间点上的 BOLD 信号；
@@ -50,7 +52,7 @@ fMRI 数据通常先通过一阶 GLM 得到每个条件的 response pattern。�
 <br>这一过程对所有 folds 重复，并对 folds 取平均。最终，在每个时间点都会得到一个 conditions × conditions 的 EEG RDM。如果有 9 个条件，则每个时间点得到 36 个 pairwise distances；如果有多个被试，最终数据结构就是 subjects × time points × 36。
 <br>需要特别注意的是，EEG 的 crossnobis 结果可能比 correlation distance 更不平滑。这是因为 crossnobis 不再是被限制在固定范围内的相关距离，而是一个未归一化的、可以为负的连续距离估计。它对 fold 内 trial 数、feature 数量、噪声协方差估计、以及是否使用真实 run/block 作为 partition 都比较敏感。因此，在 EEG 数据中计算 crossnobis 时，通常需要控制 feature 维度、平衡每个 condition 的 trial 数，并优先使用真实 run/block 作为交叉验证 folds。
 
-总结：作者推荐采用交叉验证的马氏距离；即使不计算马氏距离，但至少应结合交叉验证、多变量噪声标准化，来构建距离矩阵。
+
 <br>Q: 个人前期经验，当feature远大于样本数时，噪声协方差估计是不稳定的，此时或许不一定完全优于一般的相关距离计算？
 <br>但是自行手动写代码计算或者使用AI辅助均来实现crossnobis显得比较麻烦，可以直接采用目前成熟的系列工具包，此处列出的是RSA方法系统提出者Kriegeskorte团队开发的工具包。
 ## Toolbox

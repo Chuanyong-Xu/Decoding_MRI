@@ -23,6 +23,7 @@ fMRI 数据通常先通过一阶 GLM 得到每个条件的 response pattern。�
 <br>具体计算时，首先在每个 run 内分别估计每个条件的 beta pattern。每个 beta pattern 是一个向量，长度等于 ROI 或 searchlight 中的体素数。例如，如果有 9 个条件和 120 个体素，那么每个 run 会得到一个 9 × 120 的条件模式矩阵。
 <br>然后，利用 GLM residuals 估计噪声协方差矩阵。这个矩阵描述的是不同体素噪声之间的相关结构。普通欧氏距离默认每个体素的噪声方差相同、体素之间噪声相互独立；而马氏距离会根据噪声协方差对体素维度进行重新加权。噪声大的体素会被降低权重，噪声高度相关的体素也不会被当作完全独立的信息来源。
 <br>接着，对每个条件的 beta pattern 进行多变量噪声标准化，也就是 whitening。whitening 后的 pattern 可以理解为已经去除了不同体素噪声方差和噪声相关性的影响。在这个标准化空间中计算两个条件 pattern 的 squared Euclidean distance，就等价于在原始空间中计算 squared Mahalanobis distance。
+
 <img width="595" height="102" alt="image" src="https://github.com/user-attachments/assets/85411cdb-a9b6-4c71-aae1-2c1cc4fcaf95" />
 
 <br>如果计算普通马氏距离，可以先把所有 runs 中同一个条件的 beta pattern 平均，得到一个 conditions × voxels 的矩阵，然后在多变量噪声标准化后的 pattern 上计算所有条件两两之间的距离，最终得到一个 conditions × conditions 的 RDM。
